@@ -12,3 +12,5 @@ Also be aware of deltas. The STIGS change from time to time so you could be runn
 I’m working on a more fully fleshed out workflow that will probably be another year before it’s complete. It’s going to use open SCAP for the SCAP checks, be able to be ran remotely without the need for psexc, hopefully I’ll be able to add in new STIG downloads, CKL creation from the STIG and delta notification based on known checks and new STIGs. 
 
 If you need any assistance or have question, you can message me on Reddit.
+
+DISCLAIMER: Some checks are only "good enough". They're only good enough for the data the come back with (accuracy), and are only good enough with how i coded them (functionallity). If you fail your ATO because of me, i warned you.
