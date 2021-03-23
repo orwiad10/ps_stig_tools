@@ -1,4 +1,7 @@
-﻿#openfile function
+#the idea of this script is that there is partner scripts that run each non-scap check against the target and the output of that script is reviewed.
+#if the scap and the script output looks clean, then you can use this script to dupe.
+
+#openfile function
 Function Open-File($initialDirectory,$filter){   
     
     [System.Reflection.Assembly]::LoadWithPartialName("System.windows.forms") | Out-Null
@@ -11,7 +14,9 @@ Function Open-File($initialDirectory,$filter){
     $OpenFileDialog.filenames
 }
 
-#get pre-determined comments and any number of checklists for the same OS/Type
+#get-pre-determined comments and any number of checklists for the same OS/Type
+#csv format is (VulnID, Status, Comments) (vulnid = V-82139 status = "Not A Finding","Open", or "Not Applicable" and comment = what ever the comment is.)
+#this csv is an export of an already completed by hand checklist. 
 $stuff  = (Open-File -filter "CKL (CheckList) (*.ckl)| *.ckl" -initialDirectory ($env:USERPROFILE + "\desktop"))
 $checks = import-csv (Open-File -filter "CSV (Comma delimited) (*.csv)| *.csv" -initialDirectory ($env:USERPROFILE + "\desktop"))
 
@@ -30,7 +35,7 @@ foreach($s in $stuff){
                 #turn on winrm so we can invoke.
                 (gwmi win32_service -ComputerName $name | where{$_.name -like "winrm"}).startservice() | out-null
                 Invoke-Command $name -scriptblock {
-                    #might need to be a little more advance here if work on multi adapter systems.
+                    #might need to be a little more advance here if working on multi adapter systems.
                     return [regex]::Match((getmac | where{$_ -notlike "*Media disconnected*"})[-1],'(([0-9A-F]{2}-){5}[0-9A-F]{2})').value
                 }
             )
