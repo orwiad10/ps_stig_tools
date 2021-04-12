@@ -13,4 +13,4 @@ I’m working on a more fully fleshed out workflow that will probably be another
 
 If you need any assistance or have question, you can message me on Reddit.
 
-DISCLAIMER: Some checks are only "good enough". They're only good enough for the data the come back with (accuracy), and are only good enough with how i coded them (functionallity). If you fail your ATO because of me, i warned you.
+DISCLAIMER: Some checks are only "good enough". They're only good enough for the data they come back with (accuracy), and are only good enough with how i coded them (functionallity). If you fail your ATO because of me, i warned you.
