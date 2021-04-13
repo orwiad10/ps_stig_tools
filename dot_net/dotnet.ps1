@@ -1,3 +1,5 @@
+#V1R9
+
 function stig_object {
     param(
         $vulnid,
