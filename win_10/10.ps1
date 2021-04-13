@@ -1,3 +1,5 @@
+#V1R19
+
 $buildnum = (get-itemproperty -path 'HKlm:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' -name ReleaseId -ErrorAction SilentlyContinue).ReleaseId
 
 #63323
