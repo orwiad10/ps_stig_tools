@@ -1,9 +1,8 @@
-#V1R9
+﻿#V2R1?
 
 function stig_object {
-    param(
-        $vulnid,
-        [ValidateSet('Finding','NotAFinding')]
+    param($vulnid,
+        [ValidateSet('Open','NotAFinding','Not_Applicable')]
         $status,
         $data
     )
@@ -15,39 +14,42 @@ function stig_object {
     }
 }
 
-$dotnet = & cmd.exe /c "dir c:\ /A-D /b /s" 4>$null 3>$null 2>$null
+$dotnet     = & cmd.exe /c "dir c:\ /A-D /b /s" 4>$null 3>$null 2>$null
+$dotnet     = $dotnet | where{$_ -like "*machine.config" -or $_ -like "*exe.config"}
 
-$dotnet = $dotnet | where{$_ -like "*machine.config" -or $_ -like "*exe.config"}
+$caspol     = gci "C:\Windows\Microsoft.NET\Framework64" -Recurse | where{$_.name -eq "caspol.exe"} | select fullname
+$cassorted  = ($caspol.fullname | %{[version]$_.split("\")[-2].replace("v","")} | sort -Descending)[0].ToString()
+$newestdnet = ($caspol | where{$_.fullname -like "*$cassorted*"}).fullname
 
 if($dotnet -eq $null){
     throw "GCI Failed"
 }
 
 #7055
-write-host "V-7055"
-$StrN = Test-Path HKLM:\SOFTWARE\Microsoft\strongname\verification
-$7055stat = if($StrN -eq $false){
-    "NotAFinding"
+$StrN     = Test-Path HKLM:\SOFTWARE\Microsoft\strongname\verification
+if($StrN -eq $false){
+    $7055stat = "NotAFinding"
+    $7055data = "Path not found"
 }else{
-    "Finding"
+    $7055stat = "Open"
+    $7055data = "Path found"
 }
 
-stig_object -vulnid "V-7055" -status $7055stat
+stig_object -vulnid "V-7055" -status $7055stat -data $7055data
 
 #7063
-$check = c:\windows\Microsoft.NET\Framework64\v4.0.30319\caspol.exe -m -lg | select-string -pattern "1.6"
-
+$check = &$newestdnet -m -lg | select-string -pattern "1.6"
 
 if($check -eq $null -or $check -eq ""){
-    $7063data = $null
+    $7063data = "No Data Found"
 }else{
     $7063data = $check | select line
 }
 
-stig_object -vulnid "V-7063" -status Finding -data $7063data -depth 2 -format Custom
+stig_object -vulnid "V-7063" -status Open -data $7063data
 
 #7067
-$check1 = c:\windows\Microsoft.NET\Framework64\v4.0.30319\caspol.exe -all -lg | select-string -pattern "strongname"
+$check1 = &$newestdnet -all -lg | select-string -pattern "strongname"
 
 if($check1 -eq $null -or $check1 -eq "") {
     $7067data = $null
@@ -55,7 +57,7 @@ if($check1 -eq $null -or $check1 -eq "") {
     $7067data = $check1 | select line
 }
 
-$s = stig_object -vulnid "V-7067" -status "Finding" -data $7067data -depth 2 -format Custom
+stig_object -vulnid "V-7067" -status "Open" -data $7067data
 
 #7070
 $chan = $(foreach($d in $dotnet){
@@ -65,13 +67,13 @@ $chan = $(foreach($d in $dotnet){
 if($chan){
     $7070data = $chan
 }else{
-    $7070data = $null
+    $7070data = "No Data Found"
 }
 
-stig_object -vulnid "V-7070" -status "Finding" -data $7070data -format None
+stig_object -vulnid "V-7070" -status "Open" -data $7070data
 
 #18395
-stig_object -vulnid "V-18395" -status "Finding" -data ((Get-ChildItem C:\windows\Microsoft.NET\F* -Recurse -force | where{$_.Name -eq "Mscorlib.dll"} ).VersionInfo | where{$_.internalname -eq "Mscorlib.dll"} | select filename, productversion) -depth 2 -format Custom
+stig_object -vulnid "V-18395" -status "Open" -data ((Get-ChildItem C:\windows\Microsoft.NET\F* -Recurse -force | where{$_.Name -eq "Mscorlib.dll"} ).VersionInfo | where{$_.internalname -eq "Mscorlib.dll"} | select filename, productversion)
 
 #30935
 $bypass1 = try{
@@ -94,42 +96,42 @@ if($bypass1 -and $bypass2){
     $30935data = "No Data Found"
 }
 
-stig_object -vulnid "V-30935" -status "Finding" -data $30935data -format None
+stig_object -vulnid "V-30935" -status "Open" -data $30935data
 
 #30937
 $30937data = foreach($d in $dotnet){
     get-content $d | where{$_ -like '*NetFx40_LegacySecurityPolicy*' } | select @{n = "Path"; e = {$d}}, @{n = "Match"; e = {$_}}
 }
 
-stig_object -vulnid "V-30937" -status "Finding" -data $30937data -depth 2
-
+stig_object -vulnid "V-30937" -status "Open" -data $30937data
 #30968
 $load = $(foreach($d in $dotnet){
     get-content $d | where{$_ -like '*loadfromremotesources*' } | select @{n = "Path"; e = {$d}}, @{n = "Match"; e = {$_}}
 })
 
 if($load){
-    $load | ft -AutoSize
+    $30968data = $load | ft -AutoSize
+    $30968stat = "Open"
 }else{
-    Write-Host "Not A Finding"
+    $30968data = "No Data Found"
+    $30968stat = "NotAFinding"
 }
 
-stig_object -vulnid "V-30968" -status $30968stat
+stig_object -vulnid "V-30968" -status $30968stat -data $30968data
 
 #30972
-foreach($d in $dotnet){
+$30972data = $(foreach($d in $dotnet){
     $found = get-content $d | where{$_ -like '*defaultProxy*' } | select @{n = "Path"; e = {$d}}, @{n = "Match"; e = {$_}}
 
     if($found){
-        Write-Host ""
-        $d | ft -AutoSize
-        Write-Host ""
-        $gc = get-content $d | Select-String -SimpleMatch "defaultProxy" -Context 0,3
-        Write-Host $gc
+        [pscustomobject]@{
+            path    = $d
+            content = get-content $d | Select-String -SimpleMatch "defaultProxy" -Context 0,3
+        }
     }
-}
+})
 
-stig_object -vulnid "V-30972" -status $30972stat
+stig_object -vulnid "V-30972" -status Open -data $30972data
 
 #32025
 $chanref = $(foreach($d in $dotnet){
@@ -137,9 +139,9 @@ $chanref = $(foreach($d in $dotnet){
 })
 
 if($chanref){
-    $chanref | ft -AutoSize
+    $32025data = $chanref
 }else{
-    Write-Host "Finding"
+    $32025data = "No Data Found"
 }
 
-stig_object -vulnid "V-32025" -status $32025stat
+stig_object -vulnid "V-32025" -status Open -data $32025data
