@@ -499,7 +499,7 @@ function remote_winrm_enable {
     param($targetcomputer,$credential)
 
     #pretty sketchy way to remotley enable winrm
-    $wmicenres = wmic /user:"$(($credential.UserName).Replace("j-cre\",''))" /password:"$($credential.GetNetworkCredential().password)" /node:`'$targetcomputer`' process call create 'cmd winrm quickconfig -quiet' 4>$null 3>$null 2>$null
+    $wmicenres = wmic /user:"$(($credential.UserName).Replace("domainname\",''))" /password:"$($credential.GetNetworkCredential().password)" /node:`'$targetcomputer`' process call create 'cmd winrm quickconfig -quiet' 4>$null 3>$null 2>$null
 
     #format returns
     $wmires = ($wmicenres | where{$_ -like "*ReturnValue*"}).replace("	","").replace(";","")
