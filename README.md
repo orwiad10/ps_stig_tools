@@ -9,7 +9,7 @@ A lot of the code is organization dependent so it just may not work for you. if 
 
 Also be aware of deltas. The STIGS change from time to time so you could be running checks you no longer need or be missing new checks that have come out. i try to keep up with this but inevitably I miss things.
 
-The Stig_suite is a big group of different functions that attempts to encompass the full workflow from stig downloads to a completed check list. Ive uploaded the menubased version right now, i may upload a more formal version of it that is more parameter based and can accept lists of devices instead of doing one at a time, this version is really just a prototype.
+The Stig_suite is a big group of different functions that attempts to encompass the full workflow from stig downloads to a completed check list. Ive uploaded the menu based version right now, i may upload a more formal version of it that is more parameter based and can accept lists of devices instead of doing one at a time, this version is really just a prototype.
 
 If you need any assistance or have question, you can message me on Reddit under the same username.
 
