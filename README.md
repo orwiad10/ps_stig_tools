@@ -11,6 +11,4 @@ Also be aware of deltas. The STIGS change from time to time so you could be runn
 
 The Stig_suite is a big group of different functions that attempts to encompass the full workflow from stig downloads to a completed check list. Ive uploaded the menu based version right now, i may upload a more formal version of it that is more parameter based and can accept lists of devices instead of doing one at a time, this version is really just a prototype.
 
-If you need any assistance or have question, you can message me on Reddit under the same username.
-
 DISCLAIMER: Some checks in the manual scripts are only "good enough" on accuracy and functionallity. please review the code and result becuase if you fail your ATO because of me, i warned you.
